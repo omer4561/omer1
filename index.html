@@ -77,6 +77,14 @@
                 <option value="maintain">שמירה על המשקל</option>
                 <option value="gain">עלייה במשקל</option>
             </select>
+            <select id="activityLevel">
+                <option value="">רמת פעילות יומית</option>
+                <option value="sedentary">יושבני (מעט או ללא פעילות)</option>
+                <option value="light">פעילות קלה (1-3 ימים בשבוע)</option>
+                <option value="moderate">פעילות בינונית (3-5 ימים בשבוע)</option>
+                <option value="active">פעילות גבוהה (6-7 ימים בשבוע)</option>
+                <option value="veryActive">פעילות גבוהה מאוד (ספורטאי מקצועי)</option>
+            </select>
             <button onclick="calculateCalories()">חשב קלוריות יומיות</button>
             <p id="caloriesResult"></p>
         </div>
@@ -84,11 +92,13 @@
         <div class="section" id="foodDiary">
             <h2>יומן אכילה</h2>
             <input type="text" id="food" placeholder="מזון">
-            <input type="number" id="calories" placeholder="קלוריות">
+            <input type="number" id="grams" placeholder="גרמים (אופציונלי)*">
             <input type="time" id="mealTime">
             <button onclick="addFoodEntry()">הוסף ארוחה</button>
             <button onclick="captureImage()">צלם את הצלחת</button>
+            <input type="file" id="uploadImage" accept="image/*">
             <img id="capturedImage" style="display: none;">
+            <p>* אם לא צוינה כמות, החישוב יהיה ל-100 גרם</p>
             <ul id="foodList"></ul>
         </div>
 
@@ -168,28 +178,51 @@
             const height = parseFloat(document.getElementById('height').value);
             const age = parseInt(document.getElementById('age').value);
             const goal = document.getElementById('goal').value;
+            const activityLevel = document.getElementById('activityLevel').value;
 
-            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
-                alert('אנא הזן נתונים תקינים');
+            if (isNaN(weight) || isNaN(height) || isNaN(age) || !goal || !activityLevel) {
+                alert('אנא הזן את כל הנתונים הנדרשים');
                 return;
             }
 
             // Basic BMR calculation (Harris-Benedict equation)
             let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
 
+            // Adjust for activity level
+            let tdee;
+            switch(activityLevel) {
+                case 'sedentary':
+                    tdee = bmr * 1.2;
+                    break;
+                case 'light':
+                    tdee = bmr * 1.375;
+                    break;
+                case 'moderate':
+                    tdee = bmr * 1.55;
+                    break;
+                case 'active':
+                    tdee = bmr * 1.725;
+                    break;
+                case 'veryActive':
+                    tdee = bmr * 1.9;
+                    break;
+                default:
+                    tdee = bmr;
+            }
+
             // Adjust for goal
             switch(goal) {
                 case 'lose':
-                    dailyCalories = bmr * 0.9;
+                    dailyCalories = tdee * 0.85;
                     break;
                 case 'maintain':
-                    dailyCalories = bmr;
+                    dailyCalories = tdee;
                     break;
                 case 'gain':
-                    dailyCalories = bmr * 1.1;
+                    dailyCalories = tdee * 1.15;
                     break;
                 default:
-                    dailyCalories = bmr;
+                    dailyCalories = tdee;
             }
 
             document.getElementById('caloriesResult').textContent = `הקלוריות היומיות המומלצות: ${Math.round(dailyCalories)} קלוריות`;
@@ -197,15 +230,20 @@
 
         function addFoodEntry() {
             const food = document.getElementById('food').value;
-            const calories = parseInt(document.getElementById('calories').value);
+            const grams = parseInt(document.getElementById('grams').value) || 100;
             const time = document.getElementById('mealTime').value;
 
-            if (!food || isNaN(calories)) {
-                alert('אנא הזן נתונים תקינים');
+            if (!food) {
+                alert('אנא הזן את שם המזון');
                 return;
             }
 
-            foodEntries.push({ food, calories, time });
+            // In a real app, you would have a database of foods and their calorie content
+            // For this demo, we'll use a dummy calculation
+            const caloriesPer100g = Math.floor(Math.random() * 300) + 50;  // Random number between 50-350
+            const calories = Math.round((caloriesPer100g * grams) / 100);
+
+            foodEntries.push({ food, grams, calories, time });
             updateFoodList();
         }
 
@@ -214,7 +252,7 @@
             foodList.innerHTML = '';
             foodEntries.forEach(entry => {
                 const li = document.createElement('li');
-                li.textContent = `${entry.food} - ${entry.calories} קלוריות - ${entry.time}`;
+                li.textContent = `${entry.food} - ${entry.grams}g - ${entry.calories} קלוריות - ${entry.time}`;
                 foodList.appendChild(li);
             });
         }
@@ -226,6 +264,19 @@
             img.src = 'https://via.placeholder.com/300x200.png?text=תמונת+צלחת';
             img.style.display = 'block';
         }
+
+        document.getElementById('uploadImage').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const img = document.getElementById('capturedImage');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+
+            reader.readAsDataURL(file);
+        });
 
         function showNutritionQuestionnaire() {
             document.getElementById('nutritionQuestionnaire').style.display = 'block';
@@ -250,33 +301,5 @@
                 { day: 'יום ראשון', breakfast: 'דייסת שיבולת שועל עם פירות', lunch: 'סלט טונה עם ירקות', dinner: 'חזה עוף צלוי עם אורז מלא וירקות מאודים' },
                 { day: 'יום שני', breakfast: 'ביצה עם לחם מחיטה מלאה וירקות', lunch: 'קערת קינואה עם עדשים וירקות קלויים', dinner: 'דג סלמון עם תפוח אדמה אפוי וסלט ירוק' },
                 { day: 'יום שלישי', breakfast: 'יוגורט עם גרנולה ופירות טריים', lunch: 'כריך מחיטה מלאה עם חומוס וירקות', dinner: 'תבשיל עדשים עם ירקות ולחם מחיטה מלאה' },
-                { day: 'יום רביעי', breakfast: 'שקשוקה עם לחם מחיטה מלאה', lunch: 'סלט ירוק עם חזה עוף גריל', dinner: 'קציצות טופו עם אורז מלא וירקות מוקפצים' },
-                { day: 'יום חמישי', breakfast: 'סמוזי ירוק עם פרוסת לחם מחיטה מלאה', lunch: 'פסטה מחיטה מלאה עם רוטב עגבניות וירקות', dinner: 'אומלט ירקות עם תפוח אדמה אפוי וסלט' },
-                { day: 'יום שישי', breakfast: 'לביבות תירס עם יוגורט ופירות', lunch: 'בורגול עם עדשים וירקות צלויים', dinner: 'דג בתנור עם בטטה אפויה וירקות מאודים' },
-                { day: 'יום שבת', breakfast: 'פנקייק מחיטה מלאה עם פירות וסילאן', lunch: 'סלט ניסואז', dinner: 'קציצות בקר רזה עם קוסקוס מלא וסלט ירקות' }
-            ];
-
-            const planHTML = weeklyNutritionPlan.map(day => `
-                <h4>${day.day}</h4>
-                <p><strong>ארוחת בוקר:</strong> ${day.breakfast}</p>
-                <p><strong>ארוחת צהריים:</strong> ${day.lunch}</p>
-                <p><strong>ארוחת ערב:</strong> ${day.dinner}</p>
-            `).join('');
-
-            document.getElementById('nutritionPlanResult').innerHTML = `
-                <h3>תכנית תזונה שבועית מותאמת אישית</h3>
-                ${planHTML}
-            `;
-
-            // Set a reminder for a week from now
-            const now = new Date();
-            const inOneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            localStorage.setItem('nutritionPlanReminder', inOneWeek.toISOString());
-        }
-
-        function checkNutritionPlanReminder() {
-            const reminder = localStorage.getItem('nutritionPlanReminder');
-            if (reminder) {
-                const reminderDate = new Date(reminder);
-                if (new Date() >= reminderDate) {
-                    alert
+                { day: 'יום רביעי', breakfast: 'שקשוקה עם לחם מחיטה מלאה', lunch: 'סלט ירוק עם חזה עוף גריל', dinner: 'קציצות טופו עם א
+                    
