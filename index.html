@@ -277,4 +277,6 @@
         function checkNutritionPlanReminder() {
             const reminder = localStorage.getItem('nutritionPlanReminder');
             if (reminder) {
-                const reminderDate = new Date(reminder
+                const reminderDate = new Date(reminder);
+                if (new Date() >= reminderDate) {
+                    alert
