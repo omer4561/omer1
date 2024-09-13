@@ -59,6 +59,13 @@
             height: auto;
             margin-top: 10px;
         }
+        .result {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -86,7 +93,7 @@
                 <option value="veryActive">פעילות גבוהה מאוד (ספורטאי מקצועי)</option>
             </select>
             <button onclick="calculateCalories()">חשב קלוריות יומיות</button>
-            <p id="caloriesResult"></p>
+            <div id="caloriesResult" class="result"></div>
         </div>
 
         <div class="section" id="foodDiary">
@@ -116,7 +123,7 @@
                 <textarea id="allergiesDetails" placeholder="פרט את האלרגיות שלך" style="display:none;"></textarea>
                 <button onclick="generateNutritionPlan()">צור תכנית</button>
             </div>
-            <div id="nutritionPlanResult"></div>
+            <div id="nutritionPlanResult" class="result"></div>
         </div>
 
         <div class="section" id="recipes">
@@ -225,7 +232,8 @@
                     dailyCalories = tdee;
             }
 
-            document.getElementById('caloriesResult').textContent = `הקלוריות היומיות המומלצות: ${Math.round(dailyCalories)} קלוריות`;
+            document.getElementById('caloriesResult').innerHTML = `<strong>הקלוריות היומיות המומלצות:</strong> ${Math.round(dailyCalories)} קלוריות`;
+            document.getElementById('caloriesResult').style.display = 'block';
         }
 
         function addFoodEntry() {
@@ -304,4 +312,6 @@
             // For demonstration, we'll just display a simple weekly plan
             weeklyNutritionPlan = [
                 { day: 'יום ראשון', breakfast: 'דייסת שיבולת שועל עם פירות', lunch: 'סלט טונה עם ירקות', dinner: 'חזה עוף צלוי עם אורז מלא וירקות מאודים' },
-                { day: 'יום שני', breakfast: 'ביצה עם לחם מחיטה מלאה וירקות', lunch: 'קערת קינואה עם עדשים וירקות קלויים', dinner: 'דג ס
+                { day: 'יום שני', breakfast: 'ביצה עם לחם מחיטה מלאה וירקות', lunch: 'קערת קינואה עם עדשים וירקות קלויים', dinner: 'דג סלמון עם תפוח אדמה אפוי וסלט ירוק' },
+                { day: 'יום שלישי', breakfast: 'יוגורט עם גרנולה ופירות טריים', lunch: 'כריך מחיטה מלאה עם חומוס וירקות', dinner: 'תבשיל עדשים עם ירקות ולחם מחיטה מלאה' },
+                { day: 'יום ר
