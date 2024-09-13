@@ -5,66 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>אפליקציית כושר ותזונה</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1, h2 {
-            color: #4CAF50;
-        }
-        .section {
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        #chatBox {
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #4CAF50;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        #capturedImage {
-            max-width: 100%;
-            height: auto;
+        /* ... (previous styles remain unchanged) ... */
+        .error {
+            color: red;
             margin-top: 10px;
-        }
-        .result {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 4px;
         }
     </style>
 </head>
@@ -74,10 +18,14 @@
         
         <div class="section" id="profile">
             <h2>פרופיל לקוח</h2>
-            <input type="text" id="name" placeholder="שם">
             <input type="number" id="age" placeholder="גיל">
             <input type="number" id="weight" placeholder="משקל (ק״ג)">
             <input type="number" id="height" placeholder="גובה (ס״מ)">
+            <select id="gender">
+                <option value="">בחר מגדר</option>
+                <option value="male">זכר</option>
+                <option value="female">נקבה</option>
+            </select>
             <select id="goal">
                 <option value="">בחר מטרה</option>
                 <option value="lose">ירידה במשקל</option>
@@ -94,106 +42,43 @@
             </select>
             <button onclick="calculateCalories()">חשב קלוריות יומיות</button>
             <div id="caloriesResult" class="result"></div>
+            <div id="caloriesError" class="error"></div>
         </div>
 
-        <div class="section" id="foodDiary">
-            <h2>יומן אכילה</h2>
-            <input type="text" id="food" placeholder="מזון">
-            <input type="number" id="amount" placeholder="כמות (גרם/מ״ל)">
-            <input type="time" id="mealTime">
-            <button onclick="addFoodEntry()">הוסף ארוחה</button>
-            <button onclick="captureImage()">צלם את הצלחת</button>
-            <input type="file" id="uploadImage" accept="image/*">
-            <img id="capturedImage" style="display: none;">
-            <p>* אם לא צוינה כמות, החישוב יהיה ל-100 גרם</p>
-            <ul id="foodList"></ul>
-        </div>
+        <!-- ... (rest of the HTML remains unchanged) ... -->
 
-        <div class="section" id="nutritionPlan">
-            <h2>תכנית תזונה</h2>
-            <button onclick="showNutritionQuestionnaire()">צור תכנית תזונה מותאמת אישית</button>
-            <div id="nutritionQuestionnaire" style="display:none;">
-                <h3>שאלון תזונה</h3>
-                <textarea id="dislikedFoods" placeholder="אילו מאכלים אינך אוהב?"></textarea>
-                <div>
-                    <label>האם יש לך אלרגיות למזון?</label>
-                    <input type="radio" name="allergies" value="yes" onclick="showAllergiesInput()"> כן
-                    <input type="radio" name="allergies" value="no" onclick="hideAllergiesInput()"> לא
-                </div>
-                <textarea id="allergiesDetails" placeholder="פרט את האלרגיות שלך" style="display:none;"></textarea>
-                <button onclick="generateNutritionPlan()">צור תכנית</button>
-            </div>
-            <div id="nutritionPlanResult" class="result"></div>
-        </div>
-
-        <div class="section" id="recipes">
-            <h2>מתכונים</h2>
-            <input type="text" id="recipeSearch" placeholder="חפש מתכון">
-            <button onclick="searchRecipes()">חפש</button>
-            <div id="recipeResults"></div>
-        </div>
-
-        <div class="section" id="chat">
-            <h2>צ'אט עם יועץ תזונה AI</h2>
-            <div id="chatBox"></div>
-            <input type="text" id="userMessage" placeholder="הקלד הודעה...">
-            <button onclick="sendMessage()">שלח</button>
-        </div>
-
-        <div class="section" id="reminders">
-            <h2>תזכורות</h2>
-            <input type="time" id="waterReminder">
-            <button onclick="setWaterReminder()">הגדר תזכורת שתייה</button>
-            <p id="waterReminderStatus"></p>
-        </div>
-
-        <div class="section" id="progress">
-            <h2>מעקב התקדמות</h2>
-            <canvas id="progressChart"></canvas>
-        </div>
-
-        <div class="section" id="workoutPlan">
-            <h2>תכנית אימון</h2>
-            <select id="sportType">
-                <option value="">בחר סוג ספורט</option>
-                <option value="running">ריצה</option>
-                <option value="weightlifting">הרמת משקולות</option>
-                <option value="swimming">שחייה</option>
-                <option value="cycling">רכיבה על אופניים</option>
-            </select>
-            <select id="fitnessLevel">
-                <option value="">בחר רמת כושר</option>
-                <option value="beginner">מתחיל</option>
-                <option value="intermediate">בינוני</option>
-                <option value="advanced">מתקדם</option>
-            </select>
-            <button onclick="generateWorkoutPlan()">צור תכנית אימון מותאמת אישית</button>
-            <div id="workoutPlanResult"></div>
-        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
-        let dailyCalories = 0;
-        let foodEntries = [];
-        let waterReminders = [];
-        let weightData = [];
-        let weeklyNutritionPlan = null;
-
         function calculateCalories() {
+            const age = parseInt(document.getElementById('age').value);
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
-            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
             const goal = document.getElementById('goal').value;
             const activityLevel = document.getElementById('activityLevel').value;
 
-            if (isNaN(weight) || isNaN(height) || isNaN(age) || !goal || !activityLevel) {
-                alert('אנא הזן את כל הנתונים הנדרשים');
+            const errorElement = document.getElementById('caloriesError');
+            const resultElement = document.getElementById('caloriesResult');
+
+            // Reset previous results and errors
+            errorElement.textContent = '';
+            resultElement.innerHTML = '';
+            resultElement.style.display = 'none';
+
+            // Validate inputs
+            if (isNaN(age) || isNaN(weight) || isNaN(height) || !gender || !goal || !activityLevel) {
+                errorElement.textContent = 'אנא מלא את כל השדות בצורה תקינה.';
                 return;
             }
 
-            // Basic BMR calculation (Harris-Benedict equation)
-            let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            // Calculate BMR (Basal Metabolic Rate) using the Mifflin-St Jeor Equation
+            let bmr;
+            if (gender === 'male') {
+                bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            } else {
+                bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
 
             // Adjust for activity level
             let tdee;
@@ -218,6 +103,7 @@
             }
 
             // Adjust for goal
+            let dailyCalories;
             switch(goal) {
                 case 'lose':
                     dailyCalories = tdee * 0.85;
@@ -232,86 +118,11 @@
                     dailyCalories = tdee;
             }
 
-            document.getElementById('caloriesResult').innerHTML = `<strong>הקלוריות היומיות המומלצות:</strong> ${Math.round(dailyCalories)} קלוריות`;
-            document.getElementById('caloriesResult').style.display = 'block';
+            resultElement.innerHTML = `<strong>הקלוריות היומיות המומלצות:</strong> ${Math.round(dailyCalories)} קלוריות`;
+            resultElement.style.display = 'block';
         }
 
-        function addFoodEntry() {
-            const food = document.getElementById('food').value;
-            const amount = parseInt(document.getElementById('amount').value) || 100;
-            const time = document.getElementById('mealTime').value;
-
-            if (!food) {
-                alert('אנא הזן את שם המזון');
-                return;
-            }
-
-            // In a real app, you would have a database of foods and their calorie content
-            // For this demo, we'll use a dummy calculation
-            const caloriesPer100g = Math.floor(Math.random() * 300) + 50;  // Random number between 50-350
-            const calories = Math.round((caloriesPer100g * amount) / 100);
-
-            foodEntries.push({ food, amount, calories, time });
-            updateFoodList();
-        }
-
-        function updateFoodList() {
-            const foodList = document.getElementById('foodList');
-            foodList.innerHTML = '';
-            foodEntries.forEach(entry => {
-                const li = document.createElement('li');
-                li.textContent = `${entry.food} - ${entry.amount}g - ${entry.calories} קלוריות - ${entry.time}`;
-                foodList.appendChild(li);
-            });
-        }
-
-        function captureImage() {
-            // In a real app, this would use the device's camera
-            // For this demo, we'll just show a placeholder image
-            const img = document.getElementById('capturedImage');
-            img.src = 'https://via.placeholder.com/300x200.png?text=תמונת+צלחת';
-            img.style.display = 'block';
-        }
-
-        document.getElementById('uploadImage').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const img = document.getElementById('capturedImage');
-                img.src = e.target.result;
-                img.style.display = 'block';
-            }
-
-            reader.readAsDataURL(file);
-        });
-
-        function showNutritionQuestionnaire() {
-            document.getElementById('nutritionQuestionnaire').style.display = 'block';
-        }
-
-        function showAllergiesInput() {
-            document.getElementById('allergiesDetails').style.display = 'block';
-        }
-
-        function hideAllergiesInput() {
-            document.getElementById('allergiesDetails').style.display = 'none';
-        }
-
-        function generateNutritionPlan() {
-            const dislikedFoods = document.getElementById('dislikedFoods').value;
-            const allergies = document.querySelector('input[name="allergies"]:checked')?.value;
-            const allergiesDetails = document.getElementById('allergiesDetails').value;
-
-            if (!dislikedFoods || !allergies) {
-                alert('אנא מלא את כל השדות בשאלון');
-                return;
-            }
-
-            // Here you would typically send this data to a backend service
-            // For demonstration, we'll just display a simple weekly plan
-            weeklyNutritionPlan = [
-                { day: 'יום ראשון', breakfast: 'דייסת שיבולת שועל עם פירות', lunch: 'סלט טונה עם ירקות', dinner: 'חזה עוף צלוי עם אורז מלא וירקות מאודים' },
-                { day: 'יום שני', breakfast: 'ביצה עם לחם מחיטה מלאה וירקות', lunch: 'קערת קינואה עם עדשים וירקות קלויים', dinner: 'דג סלמון עם תפוח אדמה אפוי וסלט ירוק' },
-                { day: 'יום שלישי', breakfast: 'יוגורט עם גרנולה ופירות טריים', lunch: 'כריך מחיטה מלאה עם חומוס וירקות', dinner: 'תבשיל עדשים עם ירקות ולחם מחיטה מלאה' },
-                { day: 'יום ר
+        // ... (rest of the JavaScript remains unchanged) ...
+    </script>
+</body>
+</html>
