@@ -92,7 +92,7 @@
         <div class="section" id="foodDiary">
             <h2>יומן אכילה</h2>
             <input type="text" id="food" placeholder="מזון">
-            <input type="number" id="grams" placeholder="גרמים (אופציונלי)*">
+            <input type="number" id="amount" placeholder="כמות (גרם/מ״ל)">
             <input type="time" id="mealTime">
             <button onclick="addFoodEntry()">הוסף ארוחה</button>
             <button onclick="captureImage()">צלם את הצלחת</button>
@@ -230,7 +230,7 @@
 
         function addFoodEntry() {
             const food = document.getElementById('food').value;
-            const grams = parseInt(document.getElementById('grams').value) || 100;
+            const amount = parseInt(document.getElementById('amount').value) || 100;
             const time = document.getElementById('mealTime').value;
 
             if (!food) {
@@ -241,9 +241,9 @@
             // In a real app, you would have a database of foods and their calorie content
             // For this demo, we'll use a dummy calculation
             const caloriesPer100g = Math.floor(Math.random() * 300) + 50;  // Random number between 50-350
-            const calories = Math.round((caloriesPer100g * grams) / 100);
+            const calories = Math.round((caloriesPer100g * amount) / 100);
 
-            foodEntries.push({ food, grams, calories, time });
+            foodEntries.push({ food, amount, calories, time });
             updateFoodList();
         }
 
@@ -252,7 +252,7 @@
             foodList.innerHTML = '';
             foodEntries.forEach(entry => {
                 const li = document.createElement('li');
-                li.textContent = `${entry.food} - ${entry.grams}g - ${entry.calories} קלוריות - ${entry.time}`;
+                li.textContent = `${entry.food} - ${entry.amount}g - ${entry.calories} קלוריות - ${entry.time}`;
                 foodList.appendChild(li);
             });
         }
@@ -301,5 +301,4 @@
                 { day: 'יום ראשון', breakfast: 'דייסת שיבולת שועל עם פירות', lunch: 'סלט טונה עם ירקות', dinner: 'חזה עוף צלוי עם אורז מלא וירקות מאודים' },
                 { day: 'יום שני', breakfast: 'ביצה עם לחם מחיטה מלאה וירקות', lunch: 'קערת קינואה עם עדשים וירקות קלויים', dinner: 'דג סלמון עם תפוח אדמה אפוי וסלט ירוק' },
                 { day: 'יום שלישי', breakfast: 'יוגורט עם גרנולה ופירות טריים', lunch: 'כריך מחיטה מלאה עם חומוס וירקות', dinner: 'תבשיל עדשים עם ירקות ולחם מחיטה מלאה' },
-                { day: 'יום רביעי', breakfast: 'שקשוקה עם לחם מחיטה מלאה', lunch: 'סלט ירוק עם חזה עוף גריל', dinner: 'קציצות טופו עם א
-                    
+                { day: 'יום רביעי', breakfast: 'שקשוקה עם לחם מחיטה מלאה', lunch: 'סלט ירוק עם חזה עוף גריל', dinner: 'קציצות טופו עם אורז מלא וירקות מוקפ
