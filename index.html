@@ -5,10 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>אפליקציית כושר ותזונה</title>
     <style>
-        /* ... (previous styles remain unchanged) ... */
-        .error {
-            color: red;
-            margin-top: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #4CAF50;
+        }
+        .section {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -17,112 +57,226 @@
         <h1>אפליקציית כושר ותזונה</h1>
         
         <div class="section" id="profile">
-            <h2>פרופיל לקוח</h2>
+            <h2>פרופיל אישי</h2>
+            <input type="text" id="name" placeholder="שם">
             <input type="number" id="age" placeholder="גיל">
             <input type="number" id="weight" placeholder="משקל (ק״ג)">
             <input type="number" id="height" placeholder="גובה (ס״מ)">
-            <select id="gender">
-                <option value="">בחר מגדר</option>
-                <option value="male">זכר</option>
-                <option value="female">נקבה</option>
-            </select>
             <select id="goal">
                 <option value="">בחר מטרה</option>
                 <option value="lose">ירידה במשקל</option>
-                <option value="maintain">שמירה על המשקל</option>
+                <option value="maintain">שמירה על משקל</option>
                 <option value="gain">עלייה במשקל</option>
             </select>
-            <select id="activityLevel">
-                <option value="">רמת פעילות יומית</option>
-                <option value="sedentary">יושבני (מעט או ללא פעילות)</option>
-                <option value="light">פעילות קלה (1-3 ימים בשבוע)</option>
-                <option value="moderate">פעילות בינונית (3-5 ימים בשבוע)</option>
-                <option value="active">פעילות גבוהה (6-7 ימים בשבוע)</option>
-                <option value="veryActive">פעילות גבוהה מאוד (ספורטאי מקצועי)</option>
-            </select>
             <button onclick="calculateCalories()">חשב קלוריות יומיות</button>
-            <div id="caloriesResult" class="result"></div>
-            <div id="caloriesError" class="error"></div>
+            <p id="caloriesResult"></p>
         </div>
 
-        <!-- ... (rest of the HTML remains unchanged) ... -->
+        <div class="section" id="diet">
+            <h2>תכנית תזונה</h2>
+            <button onclick="showDietQuestionnaire()">התחל שאלון תזונה</button>
+            <div id="dietQuestionnaire" class="hidden">
+                <h3>שאלון תזונה</h3>
+                <textarea id="dislikes" placeholder="אילו מאכלים אינך אוהב?"></textarea>
+                <div>
+                    <label>
+                        <input type="checkbox" id="hasAllergies" onchange="toggleAllergiesInput()">
+                        האם יש לך אלרגיות?
+                    </label>
+                </div>
+                <textarea id="allergies" class="hidden" placeholder="פרט את האלרגיות שלך"></textarea>
+                <button onclick="generateDietPlan()">צור תכנית תזונה</button>
+            </div>
+            <div id="dietPlan" class="hidden">
+                <h3>תכנית תזונה יומית</h3>
+                <div id="mealPlan"></div>
+            </div>
+        </div>
 
+        <div class="section" id="foodDiary">
+            <h2>יומן אכילה</h2>
+            <input type="text" id="foodItem" placeholder="שם המאכל">
+            <input type="number" id="calories" placeholder="קלוריות">
+            <button onclick="addFoodItem()">הוסף לארוחה</button>
+            <ul id="foodList"></ul>
+        </div>
+
+        <div class="section" id="recipes">
+            <h2>מתכונים</h2>
+            <button onclick="showRandomRecipe()">הצג מתכון אקראי</button>
+            <div id="recipeDisplay"></div>
+        </div>
+
+        <div class="section" id="chat">
+            <h2>צ'אט עם יועץ תזונה</h2>
+            <div id="chatMessages"></div>
+            <input type="text" id="userMessage" placeholder="הקלד הודעה">
+            <button onclick="sendMessage()">שלח</button>
+        </div>
+
+        <div class="section" id="progress">
+            <h2>מעקב התקדמות</h2>
+            <canvas id="progressChart"></canvas>
+        </div>
+
+        <div class="section" id="workoutPlan">
+            <h2>תכנית אימונים</h2>
+            <button onclick="generateWorkoutPlan()">צור תכנית אימונים</button>
+            <div id="workoutPlanDisplay"></div>
+        </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
+        let userProfile = {};
+        let foodDiary = [];
+        let chatHistory = [];
+
         function calculateCalories() {
-            const age = parseInt(document.getElementById('age').value);
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
-            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('age').value);
             const goal = document.getElementById('goal').value;
-            const activityLevel = document.getElementById('activityLevel').value;
 
-            const errorElement = document.getElementById('caloriesError');
-            const resultElement = document.getElementById('caloriesResult');
-
-            // Reset previous results and errors
-            errorElement.textContent = '';
-            resultElement.innerHTML = '';
-            resultElement.style.display = 'none';
-
-            // Validate inputs
-            if (isNaN(age) || isNaN(weight) || isNaN(height) || !gender || !goal || !activityLevel) {
-                errorElement.textContent = 'אנא מלא את כל השדות בצורה תקינה.';
+            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                alert('נא למלא את כל השדות');
                 return;
             }
 
-            // Calculate BMR (Basal Metabolic Rate) using the Mifflin-St Jeor Equation
-            let bmr;
-            if (gender === 'male') {
-                bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-            } else {
-                bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-            }
+            let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            let calories = bmr * 1.2; // מקדם פעילות קלה
 
-            // Adjust for activity level
-            let tdee;
-            switch(activityLevel) {
-                case 'sedentary':
-                    tdee = bmr * 1.2;
-                    break;
-                case 'light':
-                    tdee = bmr * 1.375;
-                    break;
-                case 'moderate':
-                    tdee = bmr * 1.55;
-                    break;
-                case 'active':
-                    tdee = bmr * 1.725;
-                    break;
-                case 'veryActive':
-                    tdee = bmr * 1.9;
-                    break;
-                default:
-                    tdee = bmr;
-            }
-
-            // Adjust for goal
-            let dailyCalories;
             switch(goal) {
                 case 'lose':
-                    dailyCalories = tdee * 0.85;
-                    break;
-                case 'maintain':
-                    dailyCalories = tdee;
+                    calories -= 500;
                     break;
                 case 'gain':
-                    dailyCalories = tdee * 1.15;
+                    calories += 500;
                     break;
-                default:
-                    dailyCalories = tdee;
             }
 
-            resultElement.innerHTML = `<strong>הקלוריות היומיות המומלצות:</strong> ${Math.round(dailyCalories)} קלוריות`;
-            resultElement.style.display = 'block';
+            document.getElementById('caloriesResult').textContent = `הקלוריות היומיות המומלצות: ${Math.round(calories)}`;
+            userProfile = { weight, height, age, goal, calories };
         }
 
-        // ... (rest of the JavaScript remains unchanged) ...
+        function showDietQuestionnaire() {
+            document.getElementById('dietQuestionnaire').classList.remove('hidden');
+        }
+
+        function toggleAllergiesInput() {
+            const allergiesInput = document.getElementById('allergies');
+            allergiesInput.classList.toggle('hidden', !document.getElementById('hasAllergies').checked);
+        }
+
+        function generateDietPlan() {
+            const dislikes = document.getElementById('dislikes').value;
+            const allergies = document.getElementById('hasAllergies').checked ? document.getElementById('allergies').value : '';
+
+            // כאן תהיה לוגיקה ליצירת תפריט בהתאם להעדפות ואלרגיות
+
+            const mealPlan = `
+                <h4>ארוחת בוקר</h4>
+                <p>ביצה מקושקשת, לחם מחיטה מלאה, אבוקדו</p>
+                <h4>ארוחת צהריים</h4>
+                <p>חזה עוף צלוי, אורז מלא, סלט ירקות</p>
+                <h4>ארוחת ערב</h4>
+                <p>סלט טונה עם ירקות, קרקרים מחיטה מלאה</p>
+            `;
+
+            document.getElementById('mealPlan').innerHTML = mealPlan;
+            document.getElementById('dietPlan').classList.remove('hidden');
+        }
+
+        function addFoodItem() {
+            const foodItem = document.getElementById('foodItem').value;
+            const calories = document.getElementById('calories').value;
+            if (foodItem && calories) {
+                foodDiary.push({ food: foodItem, calories: parseInt(calories) });
+                updateFoodList();
+            }
+        }
+
+        function updateFoodList() {
+            const foodList = document.getElementById('foodList');
+            foodList.innerHTML = '';
+            foodDiary.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.food} - ${item.calories} קלוריות`;
+                foodList.appendChild(li);
+            });
+        }
+
+        function showRandomRecipe() {
+            const recipes = [
+                "סלט קינואה עם ירקות צלויים",
+                "שקשוקה טבעונית",
+                "קדירת עדשים עם ירקות",
+                "סלמון אפוי עם ירקות בתנור"
+            ];
+            const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+            document.getElementById('recipeDisplay').textContent = randomRecipe;
+        }
+
+        function sendMessage() {
+            const userMessage = document.getElementById('userMessage').value;
+            if (userMessage) {
+                chatHistory.push({ user: true, message: userMessage });
+                updateChatDisplay();
+                // כאן תהיה לוגיקה לעיבוד ההודעה ויצירת תשובה מהיועץ
+                const aiResponse = "תודה על השאלה. אני ממליץ לשמור על תזונה מאוזנת ולהקפיד על פעילות גופנית סדירה.";
+                chatHistory.push({ user: false, message: aiResponse });
+                updateChatDisplay();
+                document.getElementById('userMessage').value = '';
+            }
+        }
+
+        function updateChatDisplay() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            chatHistory.forEach(msg => {
+                const div = document.createElement('div');
+                div.textContent = msg.user ? `אתה: ${msg.message}` : `יועץ: ${msg.message}`;
+                div.style.textAlign = msg.user ? 'right' : 'left';
+                chatMessages.appendChild(div);
+            });
+        }
+
+        function generateWorkoutPlan() {
+            const workoutPlan = `
+                <h3>תכנית אימונים שבועית</h3>
+                <p>יום ראשון: אימון כוח - חזה וטריצפס</p>
+                <p>יום שני: אימון אירובי - ריצה 30 דקות</p>
+                <p>יום שלישי: אימון כוח - גב ובטן</p>
+                <p>יום רביעי: מנוחה</p>
+                <p>יום חמישי: אימון כוח - רגליים וכתפיים</p>
+                <p>יום שישי: אימון אירובי - שחייה או אופניים</p>
+                <p>יום שבת: מנוחה</p>
+            `;
+            document.getElementById('workoutPlanDisplay').innerHTML = workoutPlan;
+        }
+
+        // יצירת גרף התקדמות (דוגמה)
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['שבוע 1', 'שבוע 2', 'שבוע 3', 'שבוע 4'],
+                datasets: [{
+                    label: 'משקל (ק"ג)',
+                    data: [80, 79, 78, 77],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
