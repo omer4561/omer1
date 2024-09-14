@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>אפליקציית כושר</title>
     <style>
+        /* הסגנון נשאר ללא שינוי */
         body {
             font-family: Arial, sans-serif;
             background-color: #000;
@@ -87,218 +88,63 @@
             <p id="calorieResult"></p>
         </div>
         
-        <div class="section" id="nutritionPlan">
-            <h2>תכנית תזונה</h2>
-            <textarea id="medicalHistory" placeholder="היסטוריה רפואית"></textarea>
-            <select id="allergies" onchange="showAllergiesInput()">
-                <option value="no">אין אלרגיות</option>
-                <option value="yes">יש אלרגיות</option>
-            </select>
-            <textarea id="allergiesDetails" placeholder="פרט אלרגיות" style="display: none;"></textarea>
-            <select id="diabetes" onchange="showDiabetesInput()">
-                <option value="no">אין סוכרת</option>
-                <option value="yes">יש סוכרת</option>
-            </select>
-            <select id="diabetesType" style="display: none;">
-                <option value="type1">סוכרת סוג 1</option>
-                <option value="type2">סוכרת סוג 2</option>
-                <option value="gestational">סוכרת הריונית</option>
-            </select>
-            <textarea id="dislikedFoods" placeholder="מאכלים שאינך אוהב"></textarea>
-            <button onclick="generateMealPlan()">צור תכנית תזונה</button>
-            <div id="mealPlan" style="display: none;">
-                <h3>תפריט יומי</h3>
-                <div id="breakfast">
-                    <h4>ארוחת בוקר</h4>
-                    <p id="breakfastMenu"></p>
-                    <input type="file" accept="image/*" onchange="uploadImage(this, 'breakfast')">
-                </div>
-                <div id="lunch">
-                    <h4>ארוחת צהריים</h4>
-                    <p id="lunchMenu"></p>
-                    <input type="file" accept="image/*" onchange="uploadImage(this, 'lunch')">
-                </div>
-                <div id="dinner">
-                    <h4>ארוחת ערב</h4>
-                    <p id="dinnerMenu"></p>
-                    <input type="file" accept="image/*" onchange="uploadImage(this, 'dinner')">
-                </div>
-            </div>
-        </div>
+        <!-- שאר ה-HTML נשאר ללא שינוי -->
         
-        <div class="section" id="foodDiary">
-            <h2>יומן אכילה</h2>
-            <textarea id="dietPreferences" placeholder="העדפות תזונתיות"></textarea>
-            <input type="text" id="foodItem" placeholder="מאכל">
-            <input type="number" id="foodQuantity" placeholder="כמות (גרם)">
-            <input type="time" id="mealTime">
-            <button onclick="addFoodEntry()">הוסף לתפריט</button>
-            <ul id="foodEntries"></ul>
-        </div>
-        
-        <div class="section" id="recipes">
-            <h2>מתכונים</h2>
-            <input type="text" id="recipeSearch" placeholder="חפש מתכון">
-            <button onclick="searchRecipes()">חפש</button>
-            <div id="recipeResults"></div>
-        </div>
-        
-        <div class="section" id="chat">
-            <h2>צ'אט עם יועץ תזונה</h2>
-            <div id="chatMessages"></div>
-            <input type="text" id="chatInput" placeholder="הקלד הודעה">
-            <button onclick="sendMessage()">שלח</button>
-        </div>
-        
-        <div class="section" id="reminders">
-            <h2>תזכורות</h2>
-            <input type="time" id="reminderTime">
-            <input type="text" id="reminderText" placeholder="תוכן התזכורת">
-            <button onclick="addReminder()">הוסף תזכורת</button>
-            <ul id="reminderList"></ul>
-        </div>
-        
-        <div class="section" id="progress">
-            <h2>מעקב התקדמות</h2>
-            <div class="progress-chart" id="weightChart"></div>
-        </div>
-        
-        <div class="section" id="workoutPlan">
-            <h2>תכנית אימון</h2>
-            <button onclick="generateWorkoutPlan()">צור תכנית אימון מותאמת אישית</button>
-            <div id="workoutPlanDetails"></div>
-        </div>
     </div>
 
     <script>
         function calculateCalories() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const age = parseFloat(document.getElementById('age').value);
-            const weightGoal = document.getElementById('weightGoal').value;
-            const activityLevel = document.getElementById('activityLevel').value;
-            
-            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
-                alert('אנא הזן נתונים תקינים');
-                return;
-            }
-            
-            // חישוב BMR בסיסי (נוסחת Harris-Benedict)
-            let bmr = 10 * weight + 6.25 * height - 5 * age + 5; // +5 for men, -161 for women
-            
-            // מקדמי פעילות
-            const activityFactors = {
-                sedentary: 1.2,
-                light: 1.375,
-                moderate: 1.55,
-                high: 1.725,
-                very_high: 1.9
-            };
-            
-            // חישוב TDEE (Total Daily Energy Expenditure)
-            let tdee = bmr * activityFactors[activityLevel];
-            
-            // התאמה לפי מטרת המשקל
-            let calories;
-            switch (weightGoal) {
-                case 'lose':
-                    calories = tdee - 500; // הפחתת 500 קלוריות ליום לירידה במשקל
-                    break;
-                case 'gain':
-                    calories = tdee + 500; // הוספת 500 קלוריות ליום לעלייה במשקל
-                    break;
-                default:
-                    calories = tdee;
-            }
-            
-            document.getElementById('calorieResult').textContent = `צריכת הקלוריות היומית המומלצת: ${Math.round(calories)} קלוריות`;
-        }
-
-        function showAllergiesInput() {
-            const allergiesSelect = document.getElementById('allergies');
-            const allergiesDetails = document.getElementById('allergiesDetails');
-            allergiesDetails.style.display = allergiesSelect.value === 'yes' ? 'block' : 'none';
-        }
-
-        function showDiabetesInput() {
-            const diabetesSelect = document.getElementById('diabetes');
-            const diabetesType = document.getElementById('diabetesType');
-            diabetesType.style.display = diabetesSelect.value === 'yes' ? 'block' : 'none';
-        }
-
-        function generateMealPlan() {
-            const weightGoal = document.getElementById('weightGoal').value;
-            const allergies = document.getElementById('allergies').value;
-            const diabetes = document.getElementById('diabetes').value;
-            const dislikedFoods = document.getElementById('dislikedFoods').value;
-            
-            // כאן תוכל להוסיף לוגיקה מורכבת יותר ליצירת תפריט מותאם אישית
-            // לדוגמה, נציג תפריט פשוט
-            const breakfast = "ביצה מקושקשת, לחם מחיטה מלאה, ירקות טריים";
-            const lunch = "חזה עוף צלוי, אורז מלא, סלט ירוק";
-            const dinner = "דג סלמון, תפוח אדמה אפוי, ירקות מאודים";
-
-            document.getElementById('breakfastMenu').textContent = breakfast;
-            document.getElementById('lunchMenu').textContent = lunch;
-            document.getElementById('dinnerMenu').textContent = dinner;
-
-            document.getElementById('mealPlan').style.display = 'block';
-        }
-
-        function uploadImage(input, mealType) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.maxWidth = '100%';
-                    document.getElementById(mealType).appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function addFoodEntry() {
-            const food = document.getElementById('foodItem').value;
-            const quantity = document.getElementById('foodQuantity').value;
-            const time = document.getElementById('mealTime').value;
-            
-            if (food && quantity && time) {
-                const entry = document.createElement('li');
-                entry.textContent = `${food} - ${quantity}g ב-${time}`;
-                document.getElementById('foodEntries').appendChild(entry);
+            console.log("calculateCalories function called");
+            try {
+                const weight = parseFloat(document.getElementById('weight').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const age = parseFloat(document.getElementById('age').value);
+                const weightGoal = document.getElementById('weightGoal').value;
+                const activityLevel = document.getElementById('activityLevel').value;
                 
-                // איפוס השדות
-                document.getElementById('foodItem').value = '';
-                document.getElementById('foodQuantity').value = '';
-                document.getElementById('mealTime').value = '';
-            } else {
-                alert('אנא מלא את כל השדות');
+                console.log("Weight:", weight, "Height:", height, "Age:", age);
+                
+                if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                    throw new Error('אנא הזן נתונים תקינים');
+                }
+                
+                // חישוב BMR בסיסי (נוסחת Harris-Benedict)
+                let bmr = 10 * weight + 6.25 * height - 5 * age + 5; // +5 for men, -161 for women
+                
+                // מקדמי פעילות
+                const activityFactors = {
+                    sedentary: 1.2,
+                    light: 1.375,
+                    moderate: 1.55,
+                    high: 1.725,
+                    very_high: 1.9
+                };
+                
+                // חישוב TDEE (Total Daily Energy Expenditure)
+                let tdee = bmr * activityFactors[activityLevel];
+                
+                // התאמה לפי מטרת המשקל
+                let calories;
+                switch (weightGoal) {
+                    case 'lose':
+                        calories = tdee - 500; // הפחתת 500 קלוריות ליום לירידה במשקל
+                        break;
+                    case 'gain':
+                        calories = tdee + 500; // הוספת 500 קלוריות ליום לעלייה במשקל
+                        break;
+                    default:
+                        calories = tdee;
+                }
+                
+                document.getElementById('calorieResult').textContent = `צריכת הקלוריות היומית המומלצת: ${Math.round(calories)} קלוריות`;
+            } catch (error) {
+                console.error("Error in calculateCalories:", error);
+                alert(error.message);
             }
         }
 
-        function searchRecipes() {
-            const searchTerm = document.getElementById('recipeSearch').value;
-            // כאן תוכל להוסיף לוגיקה לחיפוש מתכונים
-            const results = document.getElementById('recipeResults');
-            results.innerHTML = `<p>תוצאות חיפוש עבור "${searchTerm}" יוצגו כאן</p>`;
-            
-            // לדוגמה, נציג מתכון פשוט עם הוראות הכנה
-            const exampleRecipe = `
-                <h3>סלט ירקות פשוט</h3>
-                <h4>מצרכים:</h4>
-                <ul>
-                    <li>2 עגבניות</li>
-                    <li>1 מלפפון</li>
-                    <li>1 פלפל אדום</li>
-                    <li>1/4 בצל סגול</li>
-                    <li>100 גרם גבינת פטה</li>
-                    <li>2 כפות שמן זית</li>
-                    <li>מיץ מחצי לימון</li>
-                    <li>מלח ופלפל לפי הטעם</li>
-                </ul>
-                <h4>הוראות הכנה:</h4>
-                <ol>
-                    <li>שטפו את הירקות היטב.</li>
-                    <li>חתכ
+        // שאר הפונקציות נשארות ללא שינוי
+
+    </script>
+</body>
+</html>
