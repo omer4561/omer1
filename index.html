@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>אפליקציית כושר ותזונה</title>
+    <title>אפליקציית כושר</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: black;
-            color: white;
+            background-color: #000;
+            color: #fff;
             margin: 0;
             padding: 20px;
         }
@@ -20,280 +20,285 @@
             color: #4CAF50;
         }
         .section {
-            background-color: #333;
+            background-color: #1a1a1a;
+            border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 5px;
         }
         input, select, textarea {
             width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px 0;
             border-radius: 4px;
-            box-sizing: border-box;
+            border: 1px solid #4CAF50;
+            background-color: #2a2a2a;
+            color: #fff;
         }
-        #chatbox {
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #chatMessages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #4CAF50;
             padding: 10px;
             margin-bottom: 10px;
         }
-        .hidden {
-            display: none;
-        }
-        #foodImage {
-            max-width: 100%;
-            margin-top: 10px;
+        .progress-chart {
+            width: 100%;
+            height: 300px;
+            background-color: #2a2a2a;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>אפליקציית כושר ותזונה</h1>
+        <h1>אפליקציית כושר</h1>
         
-        <div class="section">
+        <div class="section" id="userProfile">
             <h2>פרופיל לקוח</h2>
             <input type="text" id="name" placeholder="שם">
             <input type="number" id="age" placeholder="גיל">
-            <input type="number" id="weight" placeholder="משקל נוכחי (ק״ג)">
-            <input type="number" id="targetWeight" placeholder="משקל יעד (ק״ג)">
+            <input type="number" id="weight" placeholder="משקל (ק״ג)">
             <input type="number" id="height" placeholder="גובה (ס״מ)">
-            <textarea id="medicalHistory" placeholder="היסטוריה רפואית"></textarea>
-            <textarea id="dietPreferences" placeholder="העדפות תזונתיות"></textarea>
-            <input type="text" id="goals" placeholder="מטרות">
+            <input type="number" id="targetWeight" placeholder="משקל יעד (ק״ג)">
             <select id="weightGoal">
-                <option value="lose">לרדת במשקל</option>
                 <option value="maintain">לשמור על המשקל</option>
+                <option value="lose">לרדת במשקל</option>
                 <option value="gain">לעלות במשקל</option>
+            </select>
+            <select id="activityLevel">
+                <option value="sedentary">לא פעיל (עבודה משרדית)</option>
+                <option value="light">פעילות קלה (1-3 ימים בשבוע)</option>
+                <option value="moderate">פעילות בינונית (3-5 ימים בשבוע)</option>
+                <option value="high">פעילות גבוהה (6-7 ימים בשבוע)</option>
+                <option value="very_high">פעילות גבוהה מאוד (ספורטאי מקצועי)</option>
             </select>
             <button onclick="calculateCalories()">חשב קלוריות יומיות</button>
             <p id="calorieResult"></p>
         </div>
-
-        <div class="section">
-            <h2>יומן אכילה</h2>
-            <input type="text" id="foodItem" placeholder="מאכל">
-            <input type="number" id="calories" placeholder="קלוריות">
-            <input type="time" id="mealTime">
-            <input type="file" id="foodImageInput" accept="image/*">
-            <button onclick="addFoodEntry()">הוסף ארוחה</button>
-            <div id="foodDiary"></div>
-        </div>
-
-        <div class="section">
+        
+        <div class="section" id="nutritionPlan">
             <h2>תכנית תזונה</h2>
-            <button onclick="showNutritionQuestionnaire()">צור תכנית תזונה מותאמת אישית</button>
-            <div id="nutritionQuestionnaire" class="hidden">
-                <h3>שאלון תזונה</h3>
-                <textarea id="dislikedFoods" placeholder="אילו מאכלים אינך אוהב?"></textarea>
-                <p>האם יש לך אלרגיות למזון?</p>
-                <select id="hasAllergies" onchange="toggleAllergiesField()">
-                    <option value="no">לא</option>
-                    <option value="yes">כן</option>
-                </select>
-                <textarea id="allergies" placeholder="פרט את האלרגיות שלך" class="hidden"></textarea>
-                <button onclick="generateNutritionPlan()">צור תכנית</button>
+            <textarea id="medicalHistory" placeholder="היסטוריה רפואית"></textarea>
+            <select id="allergies" onchange="showAllergiesInput()">
+                <option value="no">אין אלרגיות</option>
+                <option value="yes">יש אלרגיות</option>
+            </select>
+            <textarea id="allergiesDetails" placeholder="פרט אלרגיות" style="display: none;"></textarea>
+            <select id="diabetes" onchange="showDiabetesInput()">
+                <option value="no">אין סוכרת</option>
+                <option value="yes">יש סוכרת</option>
+            </select>
+            <select id="diabetesType" style="display: none;">
+                <option value="type1">סוכרת סוג 1</option>
+                <option value="type2">סוכרת סוג 2</option>
+                <option value="gestational">סוכרת הריונית</option>
+            </select>
+            <textarea id="dislikedFoods" placeholder="מאכלים שאינך אוהב"></textarea>
+            <button onclick="generateMealPlan()">צור תכנית תזונה</button>
+            <div id="mealPlan" style="display: none;">
+                <h3>תפריט יומי</h3>
+                <div id="breakfast">
+                    <h4>ארוחת בוקר</h4>
+                    <p id="breakfastMenu"></p>
+                    <input type="file" accept="image/*" onchange="uploadImage(this, 'breakfast')">
+                </div>
+                <div id="lunch">
+                    <h4>ארוחת צהריים</h4>
+                    <p id="lunchMenu"></p>
+                    <input type="file" accept="image/*" onchange="uploadImage(this, 'lunch')">
+                </div>
+                <div id="dinner">
+                    <h4>ארוחת ערב</h4>
+                    <p id="dinnerMenu"></p>
+                    <input type="file" accept="image/*" onchange="uploadImage(this, 'dinner')">
+                </div>
             </div>
-            <div id="nutritionPlan"></div>
         </div>
-
-        <div class="section">
+        
+        <div class="section" id="foodDiary">
+            <h2>יומן אכילה</h2>
+            <textarea id="dietPreferences" placeholder="העדפות תזונתיות"></textarea>
+            <input type="text" id="foodItem" placeholder="מאכל">
+            <input type="number" id="foodQuantity" placeholder="כמות (גרם)">
+            <input type="time" id="mealTime">
+            <button onclick="addFoodEntry()">הוסף לתפריט</button>
+            <ul id="foodEntries"></ul>
+        </div>
+        
+        <div class="section" id="recipes">
             <h2>מתכונים</h2>
             <input type="text" id="recipeSearch" placeholder="חפש מתכון">
             <button onclick="searchRecipes()">חפש</button>
             <div id="recipeResults"></div>
         </div>
-
-        <div class="section">
-            <h2>צ'אט עם יועץ תזונה AI</h2>
-            <div id="chatbox"></div>
-            <input type="text" id="userMessage" placeholder="הקלד הודעה">
+        
+        <div class="section" id="chat">
+            <h2>צ'אט עם יועץ תזונה</h2>
+            <div id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="הקלד הודעה">
             <button onclick="sendMessage()">שלח</button>
         </div>
-
-        <div class="section">
+        
+        <div class="section" id="reminders">
             <h2>תזכורות</h2>
             <input type="time" id="reminderTime">
             <input type="text" id="reminderText" placeholder="תוכן התזכורת">
-            <button onclick="setReminder()">הגדר תזכורת</button>
-            <div id="reminders"></div>
+            <button onclick="addReminder()">הוסף תזכורת</button>
+            <ul id="reminderList"></ul>
         </div>
-
-        <div class="section">
+        
+        <div class="section" id="progress">
             <h2>מעקב התקדמות</h2>
-            <canvas id="progressChart"></canvas>
+            <div class="progress-chart" id="weightChart"></div>
         </div>
-
-        <div class="section">
+        
+        <div class="section" id="workoutPlan">
             <h2>תכנית אימון</h2>
             <button onclick="generateWorkoutPlan()">צור תכנית אימון מותאמת אישית</button>
-            <div id="workoutPlan"></div>
+            <div id="workoutPlanDetails"></div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // פונקציות JavaScript
         function calculateCalories() {
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
             const age = parseFloat(document.getElementById('age').value);
-            const goal = document.getElementById('weightGoal').value;
-
+            const weightGoal = document.getElementById('weightGoal').value;
+            const activityLevel = document.getElementById('activityLevel').value;
+            
             if (isNaN(weight) || isNaN(height) || isNaN(age)) {
-                document.getElementById('calorieResult').textContent = 'נא להזין את כל הנתונים הנדרשים.';
+                alert('אנא הזן נתונים תקינים');
                 return;
             }
-
-            let calories = 10 * weight + 6.25 * height - 5 * age + 5;
             
-            switch(goal) {
+            // חישוב BMR בסיסי (נוסחת Harris-Benedict)
+            let bmr = 10 * weight + 6.25 * height - 5 * age + 5; // +5 for men, -161 for women
+            
+            // מקדמי פעילות
+            const activityFactors = {
+                sedentary: 1.2,
+                light: 1.375,
+                moderate: 1.55,
+                high: 1.725,
+                very_high: 1.9
+            };
+            
+            // חישוב TDEE (Total Daily Energy Expenditure)
+            let tdee = bmr * activityFactors[activityLevel];
+            
+            // התאמה לפי מטרת המשקל
+            let calories;
+            switch (weightGoal) {
                 case 'lose':
-                    calories -= 500;
+                    calories = tdee - 500; // הפחתת 500 קלוריות ליום לירידה במשקל
                     break;
                 case 'gain':
-                    calories += 500;
+                    calories = tdee + 500; // הוספת 500 קלוריות ליום לעלייה במשקל
                     break;
+                default:
+                    calories = tdee;
             }
-
+            
             document.getElementById('calorieResult').textContent = `צריכת הקלוריות היומית המומלצת: ${Math.round(calories)} קלוריות`;
+        }
+
+        function showAllergiesInput() {
+            const allergiesSelect = document.getElementById('allergies');
+            const allergiesDetails = document.getElementById('allergiesDetails');
+            allergiesDetails.style.display = allergiesSelect.value === 'yes' ? 'block' : 'none';
+        }
+
+        function showDiabetesInput() {
+            const diabetesSelect = document.getElementById('diabetes');
+            const diabetesType = document.getElementById('diabetesType');
+            diabetesType.style.display = diabetesSelect.value === 'yes' ? 'block' : 'none';
+        }
+
+        function generateMealPlan() {
+            const weightGoal = document.getElementById('weightGoal').value;
+            const allergies = document.getElementById('allergies').value;
+            const diabetes = document.getElementById('diabetes').value;
+            const dislikedFoods = document.getElementById('dislikedFoods').value;
+            
+            // כאן תוכל להוסיף לוגיקה מורכבת יותר ליצירת תפריט מותאם אישית
+            // לדוגמה, נציג תפריט פשוט
+            const breakfast = "ביצה מקושקשת, לחם מחיטה מלאה, ירקות טריים";
+            const lunch = "חזה עוף צלוי, אורז מלא, סלט ירוק";
+            const dinner = "דג סלמון, תפוח אדמה אפוי, ירקות מאודים";
+
+            document.getElementById('breakfastMenu').textContent = breakfast;
+            document.getElementById('lunchMenu').textContent = lunch;
+            document.getElementById('dinnerMenu').textContent = dinner;
+
+            document.getElementById('mealPlan').style.display = 'block';
+        }
+
+        function uploadImage(input, mealType) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100%';
+                    document.getElementById(mealType).appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
         function addFoodEntry() {
             const food = document.getElementById('foodItem').value;
-            const calories = document.getElementById('calories').value;
+            const quantity = document.getElementById('foodQuantity').value;
             const time = document.getElementById('mealTime').value;
-            const imageFile = document.getElementById('foodImageInput').files[0];
             
-            const entry = document.createElement('div');
-            entry.innerHTML = `<p>${food} - ${calories} קלוריות, בשעה ${time}</p>`;
-            
-            if (imageFile) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(imageFile);
-                img.style.maxWidth = '200px';
-                entry.appendChild(img);
+            if (food && quantity && time) {
+                const entry = document.createElement('li');
+                entry.textContent = `${food} - ${quantity}g ב-${time}`;
+                document.getElementById('foodEntries').appendChild(entry);
+                
+                // איפוס השדות
+                document.getElementById('foodItem').value = '';
+                document.getElementById('foodQuantity').value = '';
+                document.getElementById('mealTime').value = '';
+            } else {
+                alert('אנא מלא את כל השדות');
             }
-            
-            document.getElementById('foodDiary').appendChild(entry);
-            
-            // ניקוי השדות לאחר ההוספה
-            document.getElementById('foodItem').value = '';
-            document.getElementById('calories').value = '';
-            document.getElementById('mealTime').value = '';
-            document.getElementById('foodImageInput').value = '';
-        }
-
-        function showNutritionQuestionnaire() {
-            document.getElementById('nutritionQuestionnaire').classList.remove('hidden');
-        }
-
-        function toggleAllergiesField() {
-            const allergiesField = document.getElementById('allergies');
-            allergiesField.classList.toggle('hidden', document.getElementById('hasAllergies').value === 'no');
-        }
-
-        function generateNutritionPlan() {
-            const dislikedFoods = document.getElementById('dislikedFoods').value;
-            const hasAllergies = document.getElementById('hasAllergies').value;
-            const allergies = hasAllergies === 'yes' ? document.getElementById('allergies').value : 'אין';
-
-            // כאן תהיה לוגיקה ליצירת תכנית תזונה מותאמת אישית
-            const plan = `
-                <h3>תכנית תזונה מותאמת אישית</h3>
-                <p>בהתחשב בהעדפותיך ובמגבלות התזונתיות שלך, הנה הצעה לתפריט יומי:</p>
-                <h4>ארוחת בוקר</h4>
-                <ul>
-                    <li>ביצה מקושקשת עם ירקות</li>
-                    <li>לחם מחיטה מלאה</li>
-                    <li>סלט ירקות טרי</li>
-                </ul>
-                <h4>ארוחת צהריים</h4>
-                <ul>
-                    <li>חזה עוף צלוי</li>
-                    <li>אורז מלא</li>
-                    <li>ירקות מאודים</li>
-                </ul>
-                <h4>ארוחת ערב</h4>
-                <ul>
-                    <li>דג סלמון צלוי</li>
-                    <li>תפוח אדמה אפוי</li>
-                    <li>סלט ירוק</li>
-                </ul>
-                <p>הערה: תכנית זו מתחשבת בכך שאינך אוהב: ${dislikedFoods || 'לא צוין'}</p>
-                <p>אלרגיות: ${allergies}</p>
-            `;
-
-            document.getElementById('nutritionPlan').innerHTML = plan;
         }
 
         function searchRecipes() {
             const searchTerm = document.getElementById('recipeSearch').value;
-            // כאן תהיה לוגיקה לחיפוש מתכונים
-            const results = `
-                <h3>תוצאות חיפוש עבור "${searchTerm}"</h3>
-                <ul>
-                    <li>מתכון 1</li>
-                    <li>מתכון 2</li>
-                    <li>מתכון 3</li>
-                </ul>
-            `;
-            document.getElementById('recipeResults').innerHTML = results;
-        }
-
-        function sendMessage() {
-            const message = document.getElementById('userMessage').value;
-            const chatbox = document.getElementById('chatbox');
-            chatbox.innerHTML += `<p><strong>אתה:</strong> ${message}</p>`;
+            // כאן תוכל להוסיף לוגיקה לחיפוש מתכונים
+            const results = document.getElementById('recipeResults');
+            results.innerHTML = `<p>תוצאות חיפוש עבור "${searchTerm}" יוצגו כאן</p>`;
             
-            // סימולציה של תגובת ה-AI
-            setTimeout(() => {
-                let response;
-                if (message.toLowerCase().includes('תזונה')) {
-                    response = "לתזונה מאוזנת יש חשיבות רבה בשמירה על בריאות תקינה. אני ממליץ על צריכה מגוונת של פירות, ירקות, חלבונים רזים, ודגנים מלאים.";
-                } else if (message.toLowerCase().includes('אימון')) {
-                    response = "אימון גופני סדיר חשוב מאוד לבריאות ולכושר. מומלץ לשלב אימוני כוח ואימונים אירוביים לתוצאות מיטביות.";
-                } else if (message.toLowerCase().includes('משקל')) {
-                    response = "שינוי משקל בריא מתבסס על איזון בין צריכת קלוריות לבין שריפתן. חשוב לזכור שירידה או עלייה במשקל צריכה להיות הדרגתית ובריאה.";
-                } else {
-                    response = "תודה על השאלה. האם תוכל לפרט יותר? אשמח לעזור בכל נושא הקשור לתזונה, כושר או בריאות כללית.";
-                }
-                chatbox.innerHTML += `<p><strong>יועץ AI:</strong> ${response}</p>`;
-                chatbox.scrollTop = chatbox.scrollHeight;
-            }, 1000);
-
-            document.getElementById('userMessage').value = '';
-        }
-
-        function setReminder() {
-            const time = document.getElementById('reminderTime').value;
-            const text = document.getElementById('reminderText').value;
-            const reminder = document.createElement('p');
-            reminder.textContent = `תזכורת ב-${time}: ${text}`;
-            document.getElementById('reminders').appendChild(reminder);
-        }
-
-        function generateWorkoutPlan() {
-            // כאן תהיה לוגיקה ליצירת תכנית אימון מותאמת אישית
-            const plan = `
-                <h3>תכנית אימון שבועית</h3>
+            // לדוגמה, נציג מתכון פשוט עם הוראות הכנה
+            const exampleRecipe = `
+                <h3>סלט ירקות פשוט</h3>
+                <h4>מצרכים:</h4>
                 <ul>
-                    <li>יום ראשון: אימון כוח - חזה וטריצפס</li>
-                    <li>יום שני: אימון קרדיו - ריצה 30 דקות</li>
-                    <li>יום שלישי: אימון כוח - גב
+                    <li>2 עגבניות</li>
+                    <li>1 מלפפון</li>
+                    <li>1 פלפל אדום</li>
+                    <li>1/4 בצל סגול</li>
+                    <li>100 גרם גבינת פטה</li>
+                    <li>2 כפות שמן זית</li>
+                    <li>מיץ מחצי לימון</li>
+                    <li>מלח ופלפל לפי הטעם</li>
+                </ul>
+                <h4>הוראות הכנה:</h4>
+                <ol>
+                    <li>שטפו את הירקות היטב.</li>
+                    <li>חתכ
